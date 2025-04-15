@@ -1,11 +1,14 @@
 import os
 import hashlib
-import fitz 
+import fitz  # PyMuPDF
 from typing import List, Dict, Tuple
 import re
 from sentence_transformers import SentenceTransformer
 import pickle
 import numpy as np
+
+from ..config import DATA_DIR, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
+from ..core.search import vector_store  # Import the local vector store
 
 def extract_text_from_pdf(file_path: str) -> str:
     """Extract text from PDF using PyMuPDF."""
@@ -128,3 +131,50 @@ def chunk_text(text: str, metadata: Dict) -> List[Tuple[str, Dict]]:
     )
     
     return chunks
+
+def ingest_file(file_path: str, file_name: str) -> str:
+    """Process a single file and add to vector store."""
+    # Create a unique ID for the file
+    file_id = hashlib.md5(file_name.encode()).hexdigest()
+    
+    # Extract text
+    text = extract_text_from_pdf(file_path)
+    
+    # Create metadata
+    metadata = {
+        "source": file_name,
+        "file_id": file_id
+    }
+    
+    # Chunk text
+    chunks = chunk_text(text, metadata)
+    
+    # Add to vector store
+    texts = [chunk[0] for chunk in chunks]
+    metadatas = [chunk[1] for chunk in chunks]
+    
+    vector_store.add_texts(texts=texts, metadatas=metadatas)
+    
+    return file_id
+
+def delete_file(file_id: str) -> bool:
+    """Delete all chunks associated with a file_id."""
+    # Delete documents by metadata field
+    deleted_count = vector_store.delete_by_metadata("file_id", file_id)
+    return deleted_count > 0
+
+def list_ingested_files() -> List[Dict]:
+    """List all ingested files."""
+    all_docs = vector_store.get_all_documents()
+    
+    # Extract unique files from metadata
+    files = {}
+    for doc, metadata in all_docs:
+        file_id = metadata.get('file_id')
+        if file_id and file_id not in files:
+            files[file_id] = {
+                'file_id': file_id,
+                'source': metadata.get('source')
+            }
+    
+    return list(files.values())
