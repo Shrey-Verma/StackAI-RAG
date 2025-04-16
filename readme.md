@@ -67,38 +67,7 @@ def needs_document_search(query: str) -> bool:
     return similarity <= threshold  # Dynamic threshold
 ```
 
-Query Processing Pipeline:
-                  ┌─────────────────┐
-                  │    User Query   │
-                  └────────┬────────┘
-                           │
-                           ▼
-                  ┌─────────────────┐
-                  │ Intent Detection│
-                  └────────┬────────┘
-                           │
-                           ▼
-          ┌────────────────────────────┐
-          │                            │
-┌─────────▼─────────┐        ┌─────────▼─────────┐
-│   Simple Intent   │        │ Knowledge-Based   │
-│  (No Search Needed)│        │  (Search Needed)  │
-└─────────┬─────────┘        └─────────┬─────────┘
-          │                            │
-          │                            ▼
-          │                  ┌─────────────────┐
-          │                  │Query Transformation│
-          │                  └─────────┬────────┘
-          │                            │
-          │                            ▼
-          │                  ┌─────────────────┐
-          │                  │ Semantic Search │
-          │                  └────────┬────────┘
-          │                           │
-┌─────────▼─────────┐        ┌────────▼────────┐
-│  Direct Answer    │        │ Knowledge-Based │
-│                   │        │    Response     │
-└───────────────────┘        └─────────────────┘
+<img width="453" alt="image" src="https://github.com/user-attachments/assets/34be60be-d217-4907-8db9-2f4d92cc0d84" />
 
 
 For queries that need document retrieval, we transform them to improve search results:
