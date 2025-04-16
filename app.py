@@ -31,7 +31,7 @@ async def debug_intent(query: str):
     
     return {
         "query": query,
-        "needs_search": needs_search,
+        "needs_search": bool(needs_search),
         "transformed": transformed
     }
 
