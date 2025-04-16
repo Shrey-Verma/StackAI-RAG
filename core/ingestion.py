@@ -154,6 +154,11 @@ def ingest_file(file_path: str, file_name: str) -> str:
     metadatas = [chunk[1] for chunk in chunks]
     
     vector_store.add_texts(texts=texts, metadatas=metadatas)
+
+    from core.query_processing import extract_document_topics, update_document_topics
+    topics = extract_document_topics(text)
+    update_document_topics(topics)
+    print("document topic updated")
     
     return file_id
 
@@ -161,7 +166,7 @@ def delete_file(file_id: str) -> bool:
     """Delete all chunks associated with a file_id."""
     # Delete documents by metadata field
     deleted_count = vector_store.delete_by_metadata("file_id", file_id)
-    return deleted_count > 0
+    return deleted_count
 
 def list_ingested_files() -> List[Dict]:
     """List all ingested files."""
