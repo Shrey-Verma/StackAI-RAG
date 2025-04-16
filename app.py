@@ -42,7 +42,7 @@ async def debug_topics():
     from pathlib import Path
     from config import DATA_DIR
     
-    topics_path = Path(DATA_DIR) / "document_topics.json"
+    topics_path = Path(DATA_DIR) / "file_topics.json"
     topics = []
     
     if topics_path.exists():
@@ -64,7 +64,9 @@ async def debug_search(query: str):
     return {
         "query": query,
         "results_count": len(results),
-        "first_result": results[0] if results else None
+        "first_result": results[0] if results else None,
+        "second_result": results[1] if len(results) > 1 else None,
+        "third_result": results[2] if len(results) > 2 else None
     }
 
 # Root endpoint

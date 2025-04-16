@@ -263,12 +263,20 @@ def hybrid_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     
     # Get BM25 scores
     bm25_scores = bm25.score(query)
+
+    print("BM25 scores:")
+    for i, score in enumerate(bm25_scores[:5]):
+        print(f"Document {i}: {score}")
     
     # Get top 2*top_k candidates from BM25
     bm25_top_indices = np.argsort(bm25_scores)[::-1][:top_k*2]
     
     # Perform semantic search
     semantic_results = vector_store.similarity_search(query=query, k=top_k)
+
+    print("\nSemantic search scores:")
+    for i, (doc, metadata, score) in enumerate(semantic_results):
+        print(f"Result {i}: {score}")
     
     # Extract document indices from semantic search results
     semantic_indices = []
@@ -288,20 +296,20 @@ def hybrid_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
             combined_results[doc_id] = {
                 'document': texts[idx],
                 'metadata': metadatas[idx],
-                'score': 1/(rank + 60)  # RRF constant
+                'score': (1/(rank + 60)) * bm25_scores[idx]  # Include BM25 score
             }
-    
-    # Score semantic results
+
+    # Score semantic results with actual similarity values
     for rank, (doc, metadata, score) in enumerate(semantic_results):
         try:
             doc_id = str(texts.index(doc))
             if doc_id in combined_results:
-                combined_results[doc_id]['score'] += 1/(rank + 60)  # RRF constant
+                combined_results[doc_id]['score'] += (1/(rank + 60)) * score  # Include semantic score
             else:
                 combined_results[doc_id] = {
                     'document': doc,
                     'metadata': metadata,
-                    'score': 1/(rank + 60)  # RRF constant
+                    'score': (1/(rank + 60)) * score  # Include semantic score
                 }
         except ValueError:
             continue
@@ -309,5 +317,14 @@ def hybrid_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     # Sort by final score
     results = list(combined_results.values())
     results.sort(key=lambda x: x['score'], reverse=True)
+    
+    print("\n----- Final Hybrid Search Results -----")
+    for i, result in enumerate(results[:top_k]):
+        print(f"Rank {i+1}: Score: {result['score']}")
+        # Print a preview of the document (first 100 characters)
+        doc_preview = result['document'][:100].replace('\n', ' ') + "..."
+        print(f"  Document Preview: {doc_preview}")
+        print(f"  Metadata: {result['metadata']}")
+        print("")
     
     return results[:top_k]

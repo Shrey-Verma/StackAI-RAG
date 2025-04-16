@@ -9,6 +9,8 @@ import numpy as np
 
 from config import DATA_DIR, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
 from core.search import vector_store  # Import the local vector store
+from core.query_processing import extract_document_topics, save_file_topics, remove_file_topics
+
 
 def extract_text_from_pdf(file_path: str) -> str:
     """Extract text from PDF using PyMuPDF."""
@@ -132,6 +134,35 @@ def chunk_text(text: str, metadata: Dict) -> List[Tuple[str, Dict]]:
     
     return chunks
 
+# def ingest_file(file_path: str, file_name: str) -> str:
+#     """Process a single file and add to vector store."""
+#     # Create a unique ID for the file
+#     file_id = hashlib.md5(file_name.encode()).hexdigest()
+    
+#     # Extract text
+#     text = extract_text_from_pdf(file_path)
+    
+#     # Create metadata
+#     metadata = {
+#         "source": file_name,
+#         "file_id": file_id
+#     }
+    
+#     # Chunk text
+#     chunks = chunk_text(text, metadata)
+    
+#     # Add to vector store
+#     texts = [chunk[0] for chunk in chunks]
+#     metadatas = [chunk[1] for chunk in chunks]
+    
+#     vector_store.add_texts(texts=texts, metadatas=metadatas)
+
+#     from core.query_processing import extract_document_topics, update_document_topics
+#     topics = extract_document_topics(text)
+#     update_document_topics(topics)
+#     print("document topic updated")
+    
+#     return file_id
 def ingest_file(file_path: str, file_name: str) -> str:
     """Process a single file and add to vector store."""
     # Create a unique ID for the file
@@ -146,6 +177,12 @@ def ingest_file(file_path: str, file_name: str) -> str:
         "file_id": file_id
     }
     
+    # Extract topics from the document
+    topics = extract_document_topics(text)
+    
+    # Save topics for this file
+    save_file_topics(file_id, topics)
+    
     # Chunk text
     chunks = chunk_text(text, metadata)
     
@@ -154,19 +191,29 @@ def ingest_file(file_path: str, file_name: str) -> str:
     metadatas = [chunk[1] for chunk in chunks]
     
     vector_store.add_texts(texts=texts, metadatas=metadatas)
-
-    from core.query_processing import extract_document_topics, update_document_topics
-    topics = extract_document_topics(text)
-    update_document_topics(topics)
-    print("document topic updated")
     
     return file_id
 
+    # def delete_file(file_id: str) -> bool:
+    #     """Delete all chunks associated with a file_id."""
+    #     # Delete documents by metadata field
+    #     deleted_count = vector_store.delete_by_metadata("file_id", file_id)
+    #     return deleted_count
+
+from core.query_processing import remove_file_topics
+
 def delete_file(file_id: str) -> bool:
     """Delete all chunks associated with a file_id."""
-    # Delete documents by metadata field
+    # Delete documents from vector store
     deleted_count = vector_store.delete_by_metadata("file_id", file_id)
-    return deleted_count
+    
+    # Remove file topics
+    if deleted_count:
+        remove_file_topics(file_id)
+        print(f"Removing topics for file_id: {file_id}")
+        return True
+    
+    return False
 
 def list_ingested_files() -> List[Dict]:
     """List all ingested files."""
