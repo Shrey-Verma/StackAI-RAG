@@ -5,7 +5,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Add current directory to path
 
-from RAG.core.query_processing import needs_document_search, update_document_topics, record_search_feedback
+from core.query_processing import needs_document_search, update_document_topics, record_search_feedback
 
 # Test data
 test_queries = [

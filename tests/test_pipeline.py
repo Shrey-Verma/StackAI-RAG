@@ -4,11 +4,11 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from RAG.core.ingestion import ingest_file
-from RAG.core.query_processing import needs_document_search, transform_query, extract_document_topics
-from RAG.core.search import hybrid_search
-from RAG.core.reranking import rerank_results
-from RAG.core.generation import prepare_context, generate_answer
+from core.ingestion import ingest_file
+from core.query_processing import needs_document_search, transform_query, extract_document_topics
+from core.search import hybrid_search
+from core.reranking import rerank_results
+from core.generation import prepare_context, generate_answer
 
 # Step 1: Load a test PDF
 test_file_path = "/Users/heyshrey/Documents/Resume_ShreyVerma.pdf"  # Replace with actual path

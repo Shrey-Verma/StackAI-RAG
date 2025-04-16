@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..")  # Add parent directory to path
 
-from RAG.core.search import vector_store
+from core.search import vector_store
 
 # Check if vector store has documents
 documents = vector_store.get_all_documents()

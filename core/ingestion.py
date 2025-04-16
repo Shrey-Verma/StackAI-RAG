@@ -7,8 +7,8 @@ from sentence_transformers import SentenceTransformer
 import pickle
 import numpy as np
 
-from ..config import DATA_DIR, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
-from ..core.search import vector_store  # Import the local vector store
+from config import DATA_DIR, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
+from core.search import vector_store  # Import the local vector store
 
 def extract_text_from_pdf(file_path: str) -> str:
     """Extract text from PDF using PyMuPDF."""

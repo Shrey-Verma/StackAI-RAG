@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from ..config import EMBEDDING_MODEL, DATA_DIR
+from config import EMBEDDING_MODEL, DATA_DIR
 
 # Path for storing feedback data and thresholds
 FEEDBACK_PATH = Path(DATA_DIR) / "query_feedback.json"

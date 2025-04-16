@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Tuple
 from sentence_transformers import SentenceTransformer
 import re
 
-from ..config import DATA_DIR, EMBEDDING_MODEL
+from config import DATA_DIR, EMBEDDING_MODEL
 
 class LocalVectorStore:
     """

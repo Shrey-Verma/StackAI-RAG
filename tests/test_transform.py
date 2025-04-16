@@ -1,7 +1,7 @@
 import sys
 sys.path.append(".")
 
-from RAG.core.query_processing import transform_query
+from core.query_processing import transform_query
 
 # Test queries
 test_queries = [

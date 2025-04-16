@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..")
 
-from RAG.core.query_processing import extract_document_topics
+from core.query_processing import extract_document_topics
 
 # Test data
 sample_document = """
